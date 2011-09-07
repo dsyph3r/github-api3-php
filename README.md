@@ -54,7 +54,7 @@ The following resources for the API are covered:
 ### Installation
 
 ````bash
-$ git clone https://github.com/dsyph3r/github-api3-php
+$ git clone git@github.com:dsyph3r/github-api3-php.git
 $ cd github-api3-php
 $ git submodule update -i
 ````
