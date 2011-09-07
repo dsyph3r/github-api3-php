@@ -13,7 +13,7 @@
 >
     <testsuites>
         <testsuite name="GitHub Test Suite">
-            <directory>./tests/GitHUb/</directory>
+            <directory>./tests/GitHub/</directory>
         </testsuite>
     </testsuites>
 

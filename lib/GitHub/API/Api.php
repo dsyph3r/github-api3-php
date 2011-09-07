@@ -2,6 +2,8 @@
 
 namespace GitHub\API;
 
+use Network\Curl\Curl;
+
 /**
  * Api
  *
@@ -43,6 +45,15 @@ class Api
      * @link http://developer.github.com/v3/#pagination
      */
     const DEFAULT_PAGE_SIZE  = 30;
+    
+    /**
+     * Constants for authentication methods. AUTH_TYPE_OAUTH is currently not
+     * implemented
+     *
+     * @link http://developer.github.com/v3/#authentication
+     */
+    const AUTH_TYPE_BASIC   = 'basic';
+    const AUTH_TYPE_OAUTH   = 'oauth';
 
     /**
      * Transport layer
@@ -52,57 +63,89 @@ class Api
     protected $transport      = null;
   
     /**
+     * Authenticatin flag. TRUE indicates subsequent API request will be made
+     * with authentication
+     *
+     * @var bool
+     */
+    protected $authenticated = false;
+  
+    /**
+     * Authenticaton username
+     *
+     * @var string
+     */
+    protected $authUsername  = null;
+  
+    /**
+     * Authentication password
+     *
+     * @var string
+     */
+    protected $authPassword  = null;
+    
+    /**
      * Constructor
      *
-     * @param   Transport $transport   Transport layer. Allows mocking of transport layer in testing
+     * @param   Curl $transport   Transport layer. Allows mocking of transport layer in testing
      */
-    public function __construct(Transport $transport = null)
+    public function __construct(Curl $transport = null)
     {
         if (null === $transport)
-            $this->transport = new Transport();
+            $this->transport = new Curl();
         else
             $this->transport = $transport;
     }
   
     /**
-     * Proxy method to transport layer authentication. Setting credentials does not
-     * log the user in. A call to login() must be made aswell
-     *
-     * @param   string  $username       Username
-     * @param   string  $password       Password
-     */
+    * Sets user credentials. Setting credentials does not log the user in.
+    * A call to login() must be made aswell
+    *
+    * @param   string  $username       Username
+    * @param   string  $password       Password
+    */
     public function setCredentials($username, $password)
     {
-        $this->transport->setCredentials($username, $password);
+        $this->authUsername = $username;
+        $this->authPassword = $password;
     }
-  
+ 
     /**
      * Proxy method to transport layer authentication. Clearing credentials does not
      * logout the user. A call to logout() must be made first
      */
     public function clearCredentials()
     {
-        $this->transport->clearCredentials();
+        if (false === $this->isAuthenticated()) {
+            $this->authUsername = '';
+            $this->authPassword = '';
+        }
+        else
+            throw new ApiException('You must logout before clearing credentials. Use logout() first');
     }
   
     /**
-     * Proxy method to transport layer authentication. Applies authentication to all
-     * subsequent API calls.
+     * Login the user. Applies authentication to all subsequent API calls.
+     * Credentials must be set first with setCredentials()
      */
     public function login()
     {
-        $this->transport->login();
+        if ((!strlen($this->authUsername)) || !strlen($this->authPassword))
+            throw new ApiException('Cannot login. You must specify the credentials first. Use setCredentials()');
+    
+        $this->authenticated = true;
     }
   
     /**
-     * Proxy method to transport layer authentication. Cancels authentication to all
-     * subsequent API calls.
+     * Logout the user. Cancels authentication to all subsequent API calls.
      *
      * @param   bool    $clearCredentials     Setting TRUE will also clear the set credentials
      */
     public function logout($clearCredentials = false)
     {
-        $this->transport->logout();
+        $this->authenticated = false;
+        if (false === $clearCredentials)
+            $this->clearCredentials();
     }
   
     /**
@@ -112,7 +155,7 @@ class Api
      */
     public function isAuthenticated()
     {
-        return $this->transport->isAuthenticated();
+        return $this->authenticated;
     }
   
     /**
@@ -134,6 +177,8 @@ class Api
      */
     public function requestGet($url, $params = array(), $options = array())
     {
+        $options = $this->applyAuthentication($options);
+        
         return $this->transport->get(self::API_URL . $url, $params, $options);
     }
   
@@ -146,6 +191,8 @@ class Api
      */
     public function requestPost($url, $params = array(), $options = array())
     {
+        $options = $this->applyAuthentication($options);
+        
         $params = (count($params)) ? json_encode($params) : null;
     
         return $this->transport->post(self::API_URL . $url, $params, $options);
@@ -160,6 +207,8 @@ class Api
      */
     public function requestPut($url, $params = array(), $options = array())
     {
+        $options = $this->applyAuthentication($options);
+        
         $params = (count($params)) ? json_encode($params) : null;
     
         return $this->transport->put(self::API_URL . $url, $params, $options);
@@ -174,6 +223,8 @@ class Api
      */
     public function requestPatch($url, $params = array(), $options = array())
     {
+        $options = $this->applyAuthentication($options);
+        
         $params = (count($params)) ? json_encode($params) : null;
     
         return $this->transport->patch(self::API_URL . $url, $params, $options);
@@ -188,11 +239,34 @@ class Api
      */
     public function requestDelete($url, $params = array(), $options = array())
     {
+        $options = $this->applyAuthentication($options);
+        
         $params = (count($params)) ? json_encode($params) : null;
     
         return $this->transport->delete(self::API_URL . $url, $params, $options);
     }
   
+    /**
+     * Check if authentication needs to be applied to requests
+     *
+     * @param   array   $options        Array of options to add auth to
+     * @return  array                   Updated options
+     */
+    public function applyAuthentication($options)
+    {
+        if ($this->isAuthenticated())
+        {
+            // Only supports basic auth for now
+            $options['auth'] = array(
+                'type'      => self::AUTH_TYPE_BASIC,
+                'username'  => $this->authUsername,
+                'password'  => $this->authPassword
+            );
+        }
+        
+        return $options;
+    }
+    
     /**
      * Generate pagintaion page parameters
      *
@@ -260,11 +334,10 @@ class ApiException extends \Exception {
 /**
  * API authentication error
  */
-class AuthenticationException extends \Exception {
-
+class AuthenticationException extends \Exception
+{
     public function __construct($message, $code = 0, \Exception $previous = null)
     {
         parent::__construct("Authentication required for action [$message]", $code, $previous);
     }
-
 }
