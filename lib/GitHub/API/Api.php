@@ -111,8 +111,8 @@ class Api
     }
  
     /**
-     * Proxy method to transport layer authentication. Clearing credentials does not
-     * logout the user. A call to logout() must be made first
+     * Clears credentials. Clearing credentials does not logout the user. A call
+     * to logout() must be made first
      */
     public function clearCredentials()
     {
@@ -149,7 +149,7 @@ class Api
     }
   
     /**
-     * Proxy method to transport layer authentication.
+     * Check if authentication will be applied
      *
      * @return bool       Returns TRUE is authentication will be applied on subsequent API calls
      */
