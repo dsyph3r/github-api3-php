@@ -41,6 +41,11 @@ around the GitHub API v3. This is achieved using a number of methods:
 The following resources for the API are covered:
 
  * [Users API](http://developer.github.com/v3/users/)
+   * [Email API](http://developer.github.com/v3/users/emails/)
+   * [Followers API](http://developer.github.com/v3/users/followers/)
+   * [Keys API](http://developer.github.com/v3/users/keys/)
+ * [Gists API](http://developer.github.com/v3/gists/)
+   * [Comments API](http://developer.github.com/v3/gists/comments/)
 
 ### Requirements
 
