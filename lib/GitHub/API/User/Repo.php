@@ -26,8 +26,6 @@ class Repo extends \GitHub\API\Repo\Repo
      *
      * Authentication Required: false|true
      *
-     * @todo Test
-     *
      * @link http://developer.github.com/v3/repos/#list
      *
      * @param   string  $username         GitHub username. Omitting this option will

@@ -26,7 +26,7 @@ class Gist extends Api
      *
      * @var Comment
      */
-    protected $comments  = null;
+    protected $comment  = null;
 
     /**
      * List gists

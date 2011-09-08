@@ -26,8 +26,6 @@ class Comment extends Api
      *
      * Authentication Required: false|true
      *
-     * @todo Test
-     *
      * @link http://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
      *
      * @param   int     $gistId           ID of gist
@@ -50,8 +48,6 @@ class Comment extends Api
      *
      * Authentication Required: false|true
      *
-     * @todo Test
-     *
      * @link http://developer.github.com/v3/gists/comments/#get-a-single-comment
      *
      * @param   int     $id               ID of comment
@@ -70,8 +66,6 @@ class Comment extends Api
      * Add a gist comment
      *
      * Authentication Required: true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/gists/comments/#create-a-comment
      *
@@ -96,8 +90,6 @@ class Comment extends Api
      *
      * Authentication Required: true
      *
-     * @todo Test
-     *
      * @link http://developer.github.com/v3/gists/comments/#edit-a-comment
      *
      * @param   int     $id               ID of gist
@@ -120,9 +112,7 @@ class Comment extends Api
      * Delete a gist comment
      *
      * Authentication Required: true
-     *
-     * @todo Test
-     *
+     * 
      * @link http://developer.github.com/v3/gists/comments/#delete-a-comment
      *
      * @param   int     $id               ID of comment

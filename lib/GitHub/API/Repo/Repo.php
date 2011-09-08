@@ -72,8 +72,6 @@ abstract class Repo extends Api
      *
      * Authentication Required: false|true
      *
-     * @todo Test
-     *
      * @link http://developer.github.com/v3/repos/#get
      *
      * @param   string  $username         User GitHub username of repo owner
@@ -83,20 +81,15 @@ abstract class Repo extends Api
      */
     public function get($username, $repo)
     {
-        $response = $this->requestGet("repos/$username/$repo");
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet("repos/$username/$repo")
+        );
     }
 
     /**
      * Create repo for authenticated user
      *
      * Authentication Required: true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/#create
      *
@@ -109,17 +102,12 @@ abstract class Repo extends Api
      */
     protected function _create($url, $repo, $details = array())
     {
-        if (false === $this->isAuthenticated())
-            throw new AuthenticationException(__FUNCTION__);
-
         // Add repo name into details
         $details['name'] = $repo;
-        $response = $this->requestPost($url, $this->buildParams($details));
-
-        if (self::HTTP_STATUS_CREATED === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        
+        return $this->processResponse(
+            $this->requestPost($url, $this->buildParams($details))
+        );
     }
 
     /**
@@ -128,8 +116,6 @@ abstract class Repo extends Api
      * Authentication Required: true
      *
      * @link http://developer.github.com/v3/repos/#edit
-     *
-     * @todo Test
      *
      * @param   string        $username   GitHub username of repo owner
      * @param   string        $repo       Name of repository
@@ -140,25 +126,18 @@ abstract class Repo extends Api
      */
     public function edit($username, $repo, $details = array())
     {
-        if (false === $this->isAuthenticated())
-            throw new AuthenticationException(__FUNCTION__);
-
         // Add repo name into details
         $details['name'] = $repoName;
-        $response = $this->requestPatch("repos/$username/$repo", $this->buildParams($details));
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        
+        return $this->processResponse(
+            $this->requestPatch("repos/$username/$repo", $this->buildParams($details))
+        );
     }
 
     /**
      * List repository contributors
      *
      * Authentication Required: false|true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/#list-contributors
      *
@@ -170,21 +149,16 @@ abstract class Repo extends Api
      */
     public function contributors($username, $repo, $includeAnonymous = true)
     {
-        $response = $this->requestGet("repos/$username/$repo/contributors", array('anon' => $includeAnonymous));
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet("repos/$username/$repo/contributors", array('anon' => $includeAnonymous))
+        );
     }
 
     /**
      * List repository languanges
      *
      * Authentication Required: false|true
-     *
-     * @todo Test
-     *
+     * 
      * @link http://developer.github.com/v3/repos/#list-languages
      *
      * @param   string        $username           GitHub username of repo owner
@@ -194,20 +168,15 @@ abstract class Repo extends Api
      */
     public function languages($username, $repo)
     {
-        $response = $this->requestGet("repos/$username/$repo/languages");
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet("repos/$username/$repo/languages")
+        );
     }
 
     /**
      * List repository teams
      *
      * Authentication Required: false|true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/#list-languages
      *
@@ -218,20 +187,15 @@ abstract class Repo extends Api
      */
     public function teams($username, $repo)
     {
-        $response = $this->requestGet("repos/$username/$repo/teams");
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet("repos/$username/$repo/teams")
+        );
     }
 
     /**
      * List repository tags
      *
      * Authentication Required: false|true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/#list-languages
      *
@@ -242,20 +206,15 @@ abstract class Repo extends Api
      */
     public function tags($username, $repo)
     {
-        $response = $this->requestGet("repos/$username/$repo/tags");
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet("repos/$username/$repo/tags")
+        );
     }
 
     /**
      * List repository branches
      *
      * Authentication Required: false|true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/#list-languages
      *
@@ -266,20 +225,15 @@ abstract class Repo extends Api
      */
     public function branches($username, $repo)
     {
-        $response = $this->requestGet("repos/$username/$repo/branches");
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet("repos/$username/$repo/branches")
+        );
     }
 
     /**
      * List repository watches
      *
      * Authentication Required: false|true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/watching/#list-watchers
      *
@@ -292,20 +246,15 @@ abstract class Repo extends Api
      */
     public function watchers($username, $repo, $page = 1, $pageSize = self::DEFAULT_PAGE_SIZE)
     {
-        $response = $this->requestGet("repos/$username/$repo/watchers", $this->buildPageParams($page, $pageSize));
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-          return $response['data'];
-        else
-          return false;
+        return $this->processResponse(
+            $this->requestGet("repos/$username/$repo/watchers", $this->buildPageParams($page, $pageSize))
+        );
     }
 
     /**
      * List repository being watched
      *
      * Authentication Required: false|true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/watching/#list-repos-being-watched
      *
@@ -316,29 +265,19 @@ abstract class Repo extends Api
     public function watched($username = null)
     {
         if (is_null($username))
-        {
-            if (false === $this->isAuthenticated())
-                throw new AuthenticationException(__FUNCTION__);
-
             $url = 'user/watched';
-        }
         else
             $url = "users/$username/watched";
 
-        $response = $this->requestGet($url);
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet($url)
+        );
     }
 
     /**
      * Check if a repository is being watched
      *
      * Authentication Required: true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/watching/#check-if-you-are-watching-a-repo
      *
@@ -349,26 +288,19 @@ abstract class Repo extends Api
     public function isWatched($username, $repo)
     {
         if (is_null($username))
-        {
-            if (false === $this->isAuthenticated())
-                throw new AuthenticationException(__FUNCTION__);
-
             $url = 'user/watched';
-        }
         else
             $url = "users/$username/watched";
 
-        $response = $this->requestGet($url);
-
-        return (self::HTTP_STATUS_NO_CONTENT === $response['status']) ? true : false;
+        return $this->processResponse(
+            $this->requestGet($url)
+        );
     }
 
     /**
      * Watch a repository
      *
      * Authentication Required: true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/watching/#watch-a-repo
      *
@@ -378,20 +310,15 @@ abstract class Repo extends Api
      */
     public function watch($username, $repo)
     {
-        if (false === $this->isAuthenticated())
-            throw new AuthenticationException(__FUNCTION__);
-
-        $response = $this->requestPut("user/watched/$username/$repo");
-
-        return (self::HTTP_STATUS_NO_CONTENT === $response['status']) ? true : false;
+        return $this->processResponse(
+            $this->requestPut("user/watched/$username/$repo")
+        );
     }
 
     /**
      * Stop watching a repository
      *
      * Authentication Required: true
-     *
-     * @todo Test
      *
      * @link http://developer.github.com/v3/repos/watching/#stop-watching-a-repo
      *
@@ -401,12 +328,9 @@ abstract class Repo extends Api
      */
     public function unwatch($username, $repo)
     {
-        if (false === $this->isAuthenticated())
-            throw new AuthenticationException(__FUNCTION__);
-
-        $response = $this->requestDelete("user/watched/$username/$repo");
-
-        return (self::HTTP_STATUS_NO_CONTENT === $response['status']) ? true : false;
+        return $this->processResponse(
+            $this->requestDelete("user/watched/$username/$repo")
+        );
     }
 
     /**
