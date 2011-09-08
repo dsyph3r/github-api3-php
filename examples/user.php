@@ -21,6 +21,7 @@ $loader->register();
 
 
 use GitHub\API\User\User;
+use GitHub\API\AuthenticationException;
 
 // Lets access the User API
 $user = new User();
@@ -42,8 +43,24 @@ var_dump($user->following('dsyph3r'));
 $user->setCredentials('username', 'password');
 $user->login();
 
-// Update some user details
-var_dump($user->update(array('location' => 'Wales, United Kingdom')));
+try
+{
+    // Check if your following user
+    var_dump($user->isFollowing("octocat"));
+
+    // Update some user details
+    var_dump($user->update(array('location' => 'Wales, United Kingdom')));
+
+    // Get all emails for user
+    var_dump($user->emails()->all());
+
+    // Add key for user
+    var_dump($user->keys()->create("New Key", "ssh-rsa CCC"));
+}
+catch (AuthenticationException $exception)
+{
+    echo $exception->getMessage();
+}
 
 // Finally lets logout
 $user->logout();
