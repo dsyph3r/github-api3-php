@@ -17,30 +17,35 @@ class User extends Api
 {
     /**
      * User emails
+     *
      * @var Email
      */
     protected $email  = null;
 
     /**
      * User keys
+     *
      * @var Key
      */
     protected $key    = null;
 
     /**
      * User repos
+     *
      * @var Repo
      */
     protected $repo   = null;
 
     /**
      * User gists
+     *
      * @var \GitHub\API\Gist\Gist
      */
     protected $gist   = null;
 
     /**
      * User issues
+     *
      * @var Issue
      */
     protected $issue   = null;
@@ -59,21 +64,12 @@ class User extends Api
      */
     public function get($username = null)
     {
-        if (is_null($username)) {
-            if (false === $this->isAuthenticated())
-                throw new AuthenticationException(__FUNCTION__);
-
+        if (is_null($username))
             $url = 'user';
-        }
         else
             $url = "users/$username";
 
-        $response = $this->requestGet($url);
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse($this->requestGet($url));
     }
 
     /**
@@ -88,12 +84,7 @@ class User extends Api
      */
     public function update(array $details)
     {
-        if (false === $this->isAuthenticated())
-            throw new AuthenticationException(__FUNCTION__);
-
-        $response = $this->requestPatch('user', $details);
-
-        return $response['data'];
+        return $this->processResponse($this->requestPatch('user', $details));
     }
 
     /**
@@ -114,21 +105,14 @@ class User extends Api
      */
     public function followers($username = null, $page = 1, $pageSize = self::DEFAULT_PAGE_SIZE)
     {
-        if (is_null($username)) {
-            if (false === $this->isAuthenticated())
-                throw new AuthenticationException(__FUNCTION__);
-
+        if (is_null($username))
             $url = 'user/followers';
-        }
         else
             $url = "users/$username/followers";
 
-        $response = $this->requestGet($url, $this->buildPageParams($page, $pageSize));
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet($url, $this->buildPageParams($page, $pageSize))
+        );
     }
 
     /**
@@ -148,21 +132,14 @@ class User extends Api
      */
     public function following($username = null, $page = 1, $pageSize = self::DEFAULT_PAGE_SIZE)
     {
-        if (is_null($username)) {
-            if (false === $this->isAuthenticated())
-                throw new AuthenticationException(__FUNCTION__);
-
+        if (is_null($username))
             $url = 'user/following';
-        }
         else
             $url = "users/$username/following";
 
-        $response = $this->requestGet($url, $this->buildPageParams($page, $pageSize));
-
-        if (self::HTTP_STATUS_OK === $response['status'])
-            return $response['data'];
-        else
-            return false;
+        return $this->processResponse(
+            $this->requestGet($url, $this->buildPageParams($page, $pageSize))
+        );
     }
 
     /**
@@ -177,12 +154,7 @@ class User extends Api
      */
     public function isFollowing($username)
     {
-        if (false === $this->isAuthenticated())
-            throw new AuthenticationException(__FUNCTION__);
-
-        $response = $this->requestGet("user/following/$username");
-
-        return (self::HTTP_STATUS_NO_CONTENT === $response['status']) ? true : false;
+        return $this->processResponse($this->requestGet("user/following/$username"));
     }
 
     /**
@@ -197,12 +169,7 @@ class User extends Api
      */
     public function follow($username)
     {
-        if (false === $this->isAuthenticated())
-            throw new AuthenticationException(__FUNCTION__);
-
-        $response = $this->requestPut("user/following/$username");
-
-        return (self::HTTP_STATUS_NO_CONTENT === $response['status']) ? true : false;
+        return $this->processResponse($this->requestPut("user/following/$username"));
     }
 
     /**
@@ -217,12 +184,7 @@ class User extends Api
      */
     public function unfollow($username)
     {
-        if (false === $this->isAuthenticated())
-            throw new AuthenticationException(__FUNCTION__);
-
-        $response = $this->requestDelete("user/following/$username");
-
-        return (self::HTTP_STATUS_NO_CONTENT === $response['status']) ? true : false;
+        return $this->processResponse($this->requestDelete("user/following/$username"));
     }
 
     /**

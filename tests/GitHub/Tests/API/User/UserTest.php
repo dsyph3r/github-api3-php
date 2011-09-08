@@ -49,10 +49,9 @@ class UserTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Should never try to access the API - expecting Exception
-        $transportMock->expects($this->never())
+        $transportMock->expects($this->once())
              ->method('get')
-             ->will($this->returnValue($this->getResultUser()));
+             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
         $this->setExpectedException('GitHub\API\AuthenticationException');
@@ -86,11 +85,10 @@ class UserTest extends ApiTest
 
         // Changes for the user
         $changes = array('name' => 'dsyph3r');
-
-        // Should never try to access the API - expecting Exception
-        $transportMock->expects($this->never())
+        
+        $transportMock->expects($this->once())
              ->method('patch')
-             ->will($this->returnValue($this->getResultUser($changes)));
+             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
         $this->setExpectedException('GitHub\API\AuthenticationException');
@@ -139,10 +137,9 @@ class UserTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Should never try to access the API - expecting Exception
-        $transportMock->expects($this->never())
+        $transportMock->expects($this->once())
              ->method('get')
-             ->will($this->returnValue($this->getResultFollowers()));
+             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
         $user->setCredentials('username', 'password');
@@ -196,10 +193,9 @@ class UserTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Should never try to access the API - expecting Exception
-        $transportMock->expects($this->never())
+        $transportMock->expects($this->once())
              ->method('get')
-             ->will($this->returnValue($this->getResultFollowing()));
+             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
         $this->setExpectedException('GitHub\API\AuthenticationException');
@@ -226,10 +222,9 @@ class UserTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Should never try to access the API - expecting Exception
-        $transportMock->expects($this->never())
+        $transportMock->expects($this->once())
              ->method('put')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
         $this->setExpectedException('GitHub\API\AuthenticationException');
@@ -256,10 +251,9 @@ class UserTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Should never try to access the API - expecting Exception
-        $transportMock->expects($this->never())
+        $transportMock->expects($this->once())
              ->method('delete')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
         $this->setExpectedException('GitHub\API\AuthenticationException');
@@ -286,10 +280,9 @@ class UserTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Should never try to access the API - expecting Exception
-        $transportMock->expects($this->never())
+        $transportMock->expects($this->once())
              ->method('get')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
         $this->setExpectedException('GitHub\API\AuthenticationException');
@@ -302,19 +295,19 @@ class UserTest extends ApiTest
         $user = new User();
         $this->assertInstanceOf('GitHub\API\User\Email', $user->emails());
     }
-    
+
     public function testKeys()
     {
         $user = new User();
         $this->assertInstanceOf('GitHub\API\User\Key', $user->keys());
     }
-    
+
     public function testRepos()
     {
         $user = new User();
         $this->assertInstanceOf('GitHub\API\User\Repo', $user->repos());
     }
-    
+
     public function testGists()
     {
         $user = new User();
@@ -344,7 +337,10 @@ class UserTest extends ApiTest
             'type'          => 'User'
         );
 
-        return array('data' => array_merge($user, $details));
+        return array(
+            'data'      => array_merge($user, $details),
+            'status'    => Api::HTTP_STATUS_OK
+        );
     }
 
     private function getResultFollowers()

@@ -15,7 +15,7 @@ class Api
      * GitHub API location
      */
     const API_URL            = 'https://api.github.com/';
-  
+
     /**
      * Constants for available API response formats. Not all API methods
      * provide responses in all formats. Defaults to FORMAT_JSON
@@ -27,7 +27,7 @@ class Api
     const FORMAT_TEXT        = 'text';
     const FORMAT_HTML        = 'html';
     const FORMAT_FULL        = 'full';
-  
+
     /**
      * Constants for HTTP status return codes
      */
@@ -35,9 +35,10 @@ class Api
     const HTTP_STATUS_CREATED                 = 201;
     const HTTP_STATUS_NO_CONTENT              = 204;
     const HTTP_STATUS_BAD_REQUEST             = 400;
+    const HTTP_STATUS_UNAUTHORIZED            = 401;
     const HTTP_STATUS_NOT_FOUND               = 404;
     const HTTP_STATUS_UNPROCESSABLE_ENTITY    = 422;
-  
+
     /**
      * Constant for default pagination size on paginate requests. API will allow
      * max of 100 requests per page
@@ -45,7 +46,7 @@ class Api
      * @link http://developer.github.com/v3/#pagination
      */
     const DEFAULT_PAGE_SIZE  = 30;
-    
+
     /**
      * Constants for authentication methods. AUTH_TYPE_OAUTH is currently not
      * implemented
@@ -57,11 +58,11 @@ class Api
 
     /**
      * Transport layer
-     * 
+     *
      * @var Transport
      */
     protected $transport      = null;
-  
+
     /**
      * Authenticatin flag. TRUE indicates subsequent API request will be made
      * with authentication
@@ -69,21 +70,21 @@ class Api
      * @var bool
      */
     protected $authenticated = false;
-  
+
     /**
      * Authenticaton username
      *
      * @var string
      */
     protected $authUsername  = null;
-  
+
     /**
      * Authentication password
      *
      * @var string
      */
     protected $authPassword  = null;
-    
+
     /**
      * Constructor
      *
@@ -96,7 +97,7 @@ class Api
         else
             $this->transport = $transport;
     }
-  
+
     /**
     * Sets user credentials. Setting credentials does not log the user in.
     * A call to login() must be made aswell
@@ -109,21 +110,22 @@ class Api
         $this->authUsername = $username;
         $this->authPassword = $password;
     }
- 
+
     /**
      * Clears credentials. Clearing credentials does not logout the user. A call
      * to logout() must be made first
      */
     public function clearCredentials()
     {
-        if (false === $this->isAuthenticated()) {
+        if (false === $this->isAuthenticated())
+        {
             $this->authUsername = '';
             $this->authPassword = '';
         }
         else
             throw new ApiException('You must logout before clearing credentials. Use logout() first');
     }
-  
+
     /**
      * Login the user. Applies authentication to all subsequent API calls.
      * Credentials must be set first with setCredentials()
@@ -132,10 +134,10 @@ class Api
     {
         if ((!strlen($this->authUsername)) || !strlen($this->authPassword))
             throw new ApiException('Cannot login. You must specify the credentials first. Use setCredentials()');
-    
+
         $this->authenticated = true;
     }
-  
+
     /**
      * Logout the user. Cancels authentication to all subsequent API calls.
      *
@@ -147,7 +149,7 @@ class Api
         if (false === $clearCredentials)
             $this->clearCredentials();
     }
-  
+
     /**
      * Check if authentication will be applied
      *
@@ -157,7 +159,7 @@ class Api
     {
         return $this->authenticated;
     }
-  
+
     /**
      * Get transport layer
      *
@@ -167,7 +169,7 @@ class Api
     {
         return $this->transport;
     }
-  
+
     /**
      * Make a HTTP GET request to API
      *
@@ -178,10 +180,10 @@ class Api
     public function requestGet($url, $params = array(), $options = array())
     {
         $options = $this->applyAuthentication($options);
-        
+
         return $this->transport->get(self::API_URL . $url, $params, $options);
     }
-  
+
     /**
      * Make a HTTP POST request to API
      *
@@ -192,12 +194,12 @@ class Api
     public function requestPost($url, $params = array(), $options = array())
     {
         $options = $this->applyAuthentication($options);
-        
+
         $params = (count($params)) ? json_encode($params) : null;
-    
+
         return $this->transport->post(self::API_URL . $url, $params, $options);
     }
-  
+
     /**
      * Make a HTTP PUT request to API
      *
@@ -208,12 +210,12 @@ class Api
     public function requestPut($url, $params = array(), $options = array())
     {
         $options = $this->applyAuthentication($options);
-        
+
         $params = (count($params)) ? json_encode($params) : null;
-    
+
         return $this->transport->put(self::API_URL . $url, $params, $options);
     }
-  
+
     /**
      * Make a HTTP PATCH request to API
      *
@@ -224,12 +226,12 @@ class Api
     public function requestPatch($url, $params = array(), $options = array())
     {
         $options = $this->applyAuthentication($options);
-        
+
         $params = (count($params)) ? json_encode($params) : null;
-    
+
         return $this->transport->patch(self::API_URL . $url, $params, $options);
     }
-  
+
     /**
      * Make a HTTP DELETE request to API
      *
@@ -240,12 +242,12 @@ class Api
     public function requestDelete($url, $params = array(), $options = array())
     {
         $options = $this->applyAuthentication($options);
-        
+
         $params = (count($params)) ? json_encode($params) : null;
-    
+
         return $this->transport->delete(self::API_URL . $url, $params, $options);
     }
-  
+
     /**
      * Check if authentication needs to be applied to requests
      *
@@ -263,10 +265,10 @@ class Api
                 'password'  => $this->authPassword
             );
         }
-        
+
         return $options;
     }
-    
+
     /**
      * Generate pagintaion page parameters
      *
@@ -280,7 +282,7 @@ class Api
           'per_page'  => $pageSize
         );
     }
-  
+
     /**
      * Generates parameters array from key/value pairs. Only values that are
      * not null are returned. This is useful for update functions where many of the fields
@@ -296,15 +298,16 @@ class Api
     protected function buildParams($rawParams)
     {
         $params = array();
-    
-        foreach ($rawParams as $key=>$value) {
+
+        foreach ($rawParams as $key=>$value)
+        {
             if (false === is_null($value))
                 $params[$key] = $value;
         }
-    
+
         return $params;
     }
-  
+
     /**
      * Sets the Mime type format options
      *
@@ -317,27 +320,58 @@ class Api
     {
         if (false === isset($options['headers']))
             $options['headers'] = array();
-    
+
         $options['headers'][] = 'Accept: application/vnd.github-' . $resourceKi . '.' . $format . '+json';
-    
+
         return $options;
     }
 
+    /**
+     * Process the repsonse from the API
+     *
+     * @param   array   $response       Raw repsonse from Transport layer
+     * @return  array|bool              Processed response
+     */
+    protected function processResponse($response)
+    {
+        switch ($response['status'])
+        {
+            // Return the data
+            case self::HTTP_STATUS_OK:
+            case self::HTTP_STATUS_CREATED:
+                return $response['data'];
+                break;
+
+            case self::HTTP_STATUS_NO_CONTENT:
+                return true;
+                break;
+
+            case self::HTTP_STATUS_NOT_FOUND:
+                return false;
+                break;
+
+            // Errors have happened, return entire response
+            case self::HTTP_STATUS_BAD_REQUEST:
+            case self::HTTP_STATUS_UNPROCESSABLE_ENTITY:
+                return $response;
+
+            // Authenitication required, or credentials invalid
+            case self::HTTP_STATUS_UNAUTHORIZED:
+                throw new AuthenticationException("Unauthorized: Authentication required");
+                break;
+
+            default:
+                return $response;
+        }
+    }
 }
 
 /**
  * General API Exception
  */
-class ApiException extends \Exception {
-}
+class ApiException extends \Exception {}
 
 /**
  * API authentication error
  */
-class AuthenticationException extends \Exception
-{
-    public function __construct($message, $code = 0, \Exception $previous = null)
-    {
-        parent::__construct("Authentication required for action [$message]", $code, $previous);
-    }
-}
+class AuthenticationException extends \Exception {}
