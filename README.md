@@ -49,7 +49,7 @@ The following resources for the API are covered:
 
 ### Requirements
 
- * PHP5+
+ * PHP 5.3+ 
  * Curl
 
 ### Dependancies
