@@ -15,6 +15,8 @@ around the GitHub API v3. This is achieved using a number of methods:
  * Abstracting the specific details of the GitHub API
 
 ```php
+    use GitHub\API\User\User;
+    
     // Setup the user, and authenticate
     $user = new User();
     $user->setCredentials('username', 'password');
@@ -91,6 +93,8 @@ At present only basic authentication is available. OAuth with be available soon.
 Authentication can be achieved as follows.
 
 ```php
+    use GitHub\API\User\User;
+    
     $user = new User();
     $user->setCredentials('username', 'password');
     $user->login();
@@ -244,6 +248,8 @@ GitHub API Documentation - [User Email API](http://developer.github.com/v3/users
 The email API can be used independently of the other API's as follows:
 
 ```php
+    use GitHub\API\User\Email;
+    
     $email = new Email();
     $response = $email->all();
 ```
@@ -252,6 +258,8 @@ However, as emails are related to the user you can also access the email API via
 user as follows:
 
 ```php
+    use GitHub\API\User\User;
+    
     $user = new User();
     $response = $user->emails()->all();
 ```
@@ -302,7 +310,9 @@ GitHub API Documentation - [User Keys API](http://developer.github.com/v3/users/
 The keys API can be used independently of the other API's as follows:
 
 ```php
-    $key = new Keys();
+    use GitHub\API\User\Key;
+    
+    $key = new Key();
     $response = $key->all();
 ```
 
@@ -310,6 +320,8 @@ However, as keys are related to the user you can also access the keys API via th
 user as follows:
 
 ```php
+    use GitHub\API\User\User;
+    
     $user = new User();
     $response = $user->keys()->all();
 ```
@@ -365,6 +377,8 @@ GitHub API Documentation - [Gists API](http://developer.github.com/v3/gists/).
 The gists API can be used independently of the other API's as follows:
 
 ```php
+    use GitHub\API\Gist\Gist;
+    
     $gist = new Gist();
     $response = $gist->all();
 ```
@@ -511,7 +525,9 @@ GitHub API Documentation - [Gists Comments API](http://developer.github.com/v3/g
 The gists comments API can be used independently of the other API's as follows:
 
 ```php
-    $comment = new GistComment();
+    use GitHub\API\Gist\Comment;
+    
+    $comment = new Comment();
     $response = $comment->all();
 ```
 
@@ -519,6 +535,8 @@ However, as comments are related to the gists you can also access the comments A
 gist as follows:
 
 ```php
+    use GitHub\API\Gist\Gist;
+    
     $gist = new Gist();
     $response = $gist->comments()->all();
 ```
