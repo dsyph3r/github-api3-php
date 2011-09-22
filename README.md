@@ -83,7 +83,7 @@ documentation.
 ### Credits
 
 Ideas from the excellent
-(php-github-api)[https://github.com/ornicar/php-github-api] library by
+[php-github-api](https://github.com/ornicar/php-github-api) library by
 [ornicar](https://github.com/ornicar) have been used in this library.
 
 ## Authentication
