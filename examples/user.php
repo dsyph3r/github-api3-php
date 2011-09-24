@@ -14,7 +14,7 @@ require_once dirname(__FILE__) . '/../lib/vendor/Symfony/Component/ClassLoader/U
 $loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
 // Register the location of the GitHub namespace
 $loader->registerNamespaces(array(
-    'Network'           => __DIR__.'/../lib/vendor/curl-php/lib',
+    'Buzz'              => __DIR__.'/../lib/vendor/Buzz/lib',
     'GitHub'            => __DIR__.'/../lib'
 ));
 $loader->register();

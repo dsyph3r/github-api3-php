@@ -13,7 +13,6 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultGists();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
             ->method('get')
@@ -33,7 +32,6 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultGists();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
             ->method('get')
@@ -63,7 +61,6 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultGist();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
             ->method('get')
@@ -90,7 +87,7 @@ class GistTest extends ApiTest
 
         // Setup exepected result - Need to set HTTP status also
         $expectedResults = $this->getResultGist($gistResult);
-        $expectedResults['status'] = Api::HTTP_STATUS_CREATED;
+        $expectedResults->addHeader('HTTP/1.1 201 Created');
 
         $transportMock->expects($this->once())
             ->method('post')
@@ -133,7 +130,6 @@ class GistTest extends ApiTest
 
         // Setup exepected result - Need to set HTTP status also
         $expectedResults = $this->getResultGist($gistResult);
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
             ->method('patch')
@@ -170,7 +166,7 @@ class GistTest extends ApiTest
 
         $transportMock->expects($this->once())
              ->method('put')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultNoContent()));
 
         $gist = new Gist($transportMock);
         // Get authenticated
@@ -199,7 +195,7 @@ class GistTest extends ApiTest
 
         $transportMock->expects($this->once())
              ->method('delete')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultNoContent()));
 
         $gist = new Gist($transportMock);
         // Get authenticated
@@ -228,7 +224,7 @@ class GistTest extends ApiTest
 
         $transportMock->expects($this->once())
              ->method('get')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultNoContent()));
 
         $gist = new Gist($transportMock);
         // Get authenticated
@@ -257,7 +253,7 @@ class GistTest extends ApiTest
 
         // Setup exepected result - Need to set HTTP status also
         $expectedResults = $this->getResultGist();
-        $expectedResults['status'] = Api::HTTP_STATUS_CREATED;
+        $expectedResults->addHeader('HTTP/1.1 201 Created');
 
         $transportMock->expects($this->once())
             ->method('post')
@@ -290,13 +286,9 @@ class GistTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Setup exepected result - Need to set HTTP status also
-        $expectedResults = array();
-        $expectedResults['status'] = Api::HTTP_STATUS_NO_CONTENT;
-
         $transportMock->expects($this->once())
             ->method('delete')
-            ->will($this->returnValue($expectedResults));
+            ->will($this->returnValue($this->getResultNoContent()));
 
         $gist = new Gist($transportMock);
 
@@ -326,9 +318,9 @@ class GistTest extends ApiTest
         $this->assertInstanceOf('GitHub\API\Gist\Comment', $gist->comments());
     }
 
-    private function getResultGists($additionalGists = array())
+    private function getGists()
     {
-        $gists = array(
+        return array(
             array(
                 "url"           => "https://api.github.com/gists/1",
                 "id"            => "1",
@@ -354,15 +346,25 @@ class GistTest extends ApiTest
                 "created_at"    => "2010-04-14T02:15:15Z"
             ),
         );
-
-        return array('data' => array_merge($gists, $additionalGists));
+    }
+    private function getResultGists($additionalGists = array())
+    {
+        $gists = $this->getGists();
+        
+        $response = new \Buzz\Message\Response;
+        $response->setContent(array_merge($gists, $additionalGists));
+        $response->addHeader('HTTP/1.1 200 OK');
+        
+        return $response;
     }
 
     private function getResultGist($details = array())
     {
-        $gists = $this->getResultGists();
-        $gist  = $gists['data'][0];
-
-        return array('data' => array_merge($gist, $details));
+        $gists = $this->getGists();
+        $response = new \Buzz\Message\Response;
+        $response->setContent(array_merge($gists[0], $details));
+        $response->addHeader('HTTP/1.1 200 OK');
+        
+        return $response;
     }
 }

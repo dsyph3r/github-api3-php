@@ -44,7 +44,6 @@ class KeyTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResult = $this->getResultKey();
-        $expectedResult['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
             ->method('get')
@@ -80,7 +79,7 @@ class KeyTest extends ApiTest
         $create = array('title' => 'New Key Title', 'key' => 'ssh-rsa ABC');
 
         $expectedResults = $this->getResultKeys(array($create));
-        $expectedResults['status'] = Api::HTTP_STATUS_CREATED;
+        $expectedResults->addHeader('HTTP/1.1 201 Created');
 
         $transportMock->expects($this->once())
             ->method('post')
@@ -117,7 +116,6 @@ class KeyTest extends ApiTest
         $update = array('title' => 'Update Key Title', 'key' => 'ssh-rsa ABCDEF');
 
         $expectedResults = $this->getResultKey($update);
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
             ->method('patch')
@@ -150,13 +148,9 @@ class KeyTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Setup exepected result - Need to set HTTP status also
-        $expectedResults = array();
-        $expectedResults['status'] = Api::HTTP_STATUS_NO_CONTENT;
-
         $transportMock->expects($this->once())
             ->method('delete')
-            ->will($this->returnValue($expectedResults));
+            ->will($this->returnValue($this->getResultNoContent()));
 
         $key = new Key($transportMock);
 
@@ -171,13 +165,9 @@ class KeyTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Setup exepected result - Need to set HTTP status
-        $expectedResults = array();
-        $expectedResults['status'] = Api::HTTP_STATUS_NOT_FOUND;
-
         $transportMock->expects($this->once())
             ->method('delete')
-            ->will($this->returnValue($expectedResults));
+            ->will($this->returnValue($this->getResultNotFound()));
 
         $key = new Key($transportMock);
 
@@ -218,18 +208,27 @@ class KeyTest extends ApiTest
                 'key'       => 'ssh-rsa BBB...'
             )
         );
-
-        return array(
-            'data'      => array_merge($keys, $additionalKeys),
-            'status'    => Api::HTTP_STATUS_OK
-        );
+        
+        $response = new \Buzz\Message\Response;
+        $response->setContent(array_merge($keys, $additionalKeys));
+        $response->addHeader('HTTP/1.1 200 OK');
+        
+        return $response;
     }
 
     private function getResultKey($details = array())
     {
-        $keys = $this->getResultKeys();
-        $key  = $keys['data'][0];
-
-        return array('data' => array_merge($key, $details));
+        $key = array(
+            'url'       =>'https://api.github.com/user/keys/1',
+            'id'        => 1,
+            'title'     => 'octocat@octomac',
+            'key'       => 'ssh-rsa AAA...'
+        );
+        
+        $response = new \Buzz\Message\Response;
+        $response->setContent(array_merge($key, $details));
+        $response->addHeader('HTTP/1.1 200 OK');
+        
+        return $response;
     }
 }

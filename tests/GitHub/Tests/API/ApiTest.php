@@ -8,13 +8,27 @@ abstract class ApiTest extends \PHPUnit_Framework_TestCase
 {
     protected function getTransportMock()
     {
-        return $this->getMock('Network\Curl\Curl', array('get', 'post', 'put', 'patch', 'delete'));
+        return $this->getMock('Buzz\Browser', array('get', 'post', 'put', 'patch', 'delete'));
     }
 
     protected function getResultUnauthorized()
     {
-        return array(
-            'status'    => Api::HTTP_STATUS_UNAUTHORIZED
-        );
+        $response = new \Buzz\Message\Response;
+        $response->addHeader('HTTP/1.1 401 Unauthorized');
+        return $response;
+    }
+    
+    protected function getResultNoContent()
+    {
+        $response = new \Buzz\Message\Response;
+        $response->addHeader('HTTP/1.1 204 No Content');
+        return $response;
+    }
+    
+    protected function getResultNotFound()
+    {
+        $response = new \Buzz\Message\Response;
+        $response->addHeader('HTTP/1.1 404 Not Found');
+        return $response;
     }
 }

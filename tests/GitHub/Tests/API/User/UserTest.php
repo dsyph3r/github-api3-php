@@ -13,7 +13,6 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultUser();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
              ->method('get')
@@ -31,7 +30,6 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultUser();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
              ->method('get')
@@ -101,7 +99,6 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultFollowers();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
              ->method('get')
@@ -119,7 +116,6 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultFollowers();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
              ->method('get')
@@ -157,7 +153,6 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultFollowing();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
              ->method('get')
@@ -175,7 +170,6 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $expectedResults = $this->getResultFollowing();
-        $expectedResults['status'] = Api::HTTP_STATUS_OK;
 
         $transportMock->expects($this->once())
              ->method('get')
@@ -209,7 +203,7 @@ class UserTest extends ApiTest
 
         $transportMock->expects($this->once())
              ->method('put')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultNoContent()));
 
         $user = new User($transportMock);
         // Get authenticated
@@ -238,7 +232,7 @@ class UserTest extends ApiTest
 
         $transportMock->expects($this->once())
              ->method('delete')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultNoContent()));
 
         $user = new User($transportMock);
         // Get authenticated
@@ -267,7 +261,7 @@ class UserTest extends ApiTest
 
         $transportMock->expects($this->once())
              ->method('get')
-             ->will($this->returnValue(array('status' => Api::HTTP_STATUS_NO_CONTENT)));
+             ->will($this->returnValue($this->getResultNoContent()));
 
         $user = new User($transportMock);
         // Get authenticated
@@ -337,37 +331,46 @@ class UserTest extends ApiTest
             'type'          => 'User'
         );
 
-        return array(
-            'data'      => array_merge($user, $details),
-            'status'    => Api::HTTP_STATUS_OK
-        );
+        $response = new \Buzz\Message\Response;
+        $response->setContent(array_merge($user, $details));
+        $response->addHeader('HTTP/1.1 200 OK');
+        
+        return $response;
     }
 
     private function getResultFollowers()
     {
-        return array(
-            'data' => array(
-                array(
-                    'login'         => 'octocat',
-                    'id'            => 1,
-                    'gravatar_url'  => 'https://github.com/images/error/octocat_happy.gif',
-                    'url'           => 'https://api.github.com/users/octocat'
-                )
+        $data = array(
+            array(
+                'login'         => 'octocat',
+                'id'            => 1,
+                'gravatar_url'  => 'https://github.com/images/error/octocat_happy.gif',
+                'url'           => 'https://api.github.com/users/octocat'
             )
         );
+        
+        $response = new \Buzz\Message\Response;
+        $response->setContent($data);
+        $response->addHeader('HTTP/1.1 200 OK');
+        
+        return $response;
     }
 
     private function getResultFollowing()
     {
-        return array(
-            'data' => array(
-                array(
-                    'login'         => 'octocat',
-                    'id'            => 1,
-                    'gravatar_url'  => 'https://github.com/images/error/octocat_happy.gif',
-                    'url'           => 'https://api.github.com/users/octocat'
-                )
+        $data = array(
+            array(
+                'login'         => 'octocat',
+                'id'            => 1,
+                'gravatar_url'  => 'https://github.com/images/error/octocat_happy.gif',
+                'url'           => 'https://api.github.com/users/octocat'
             )
         );
+        
+        $response = new \Buzz\Message\Response;
+        $response->setContent($data);
+        $response->addHeader('HTTP/1.1 200 OK');
+        
+        return $response;
     }
 }

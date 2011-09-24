@@ -2,7 +2,7 @@
 
 namespace GitHub\API;
 
-use Network\Curl\Curl;
+use Buzz\Browser;
 
 /**
  * Api
@@ -88,12 +88,12 @@ class Api
     /**
      * Constructor
      *
-     * @param   Curl $transport   Transport layer. Allows mocking of transport layer in testing
+     * @param   Browser $transport   Transport layer. Allows mocking of transport layer in testing
      */
-    public function __construct(Curl $transport = null)
+    public function __construct(Browser $transport = null)
     {
         if (null === $transport)
-            $this->transport = new Curl();
+            $this->transport = new Browser();
         else
             $this->transport = $transport;
     }
@@ -278,8 +278,8 @@ class Api
      */
     protected function buildPageParams($page, $pageSize) {
         return array(
-          'page'      => $page,
-          'per_page'  => $pageSize
+            'page'      => $page,
+            'per_page'  => $pageSize
         );
     }
 
@@ -334,12 +334,12 @@ class Api
      */
     protected function processResponse($response)
     {
-        switch ($response['status'])
+        switch ($response->getStatusCode())
         {
             // Return the data
             case self::HTTP_STATUS_OK:
             case self::HTTP_STATUS_CREATED:
-                return $response['data'];
+                return $response->getContent();
                 break;
 
             case self::HTTP_STATUS_NO_CONTENT:

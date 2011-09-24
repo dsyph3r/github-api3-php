@@ -45,7 +45,7 @@ class EmailTest extends ApiTest
 
         // Setup exepected result - Need to set HTTP status also
         $expectedResults = $this->getResultEmails(array('addme@test.com'));
-        $expectedResults['status'] = Api::HTTP_STATUS_CREATED;
+        $expectedResults->addHeader('HTTP/1.1 201 Created');
 
         $transportMock->expects($this->once())
             ->method('post')
@@ -78,13 +78,9 @@ class EmailTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Setup exepected result - Need to set HTTP status also
-        $expectedResults = array();
-        $expectedResults['status'] = Api::HTTP_STATUS_NO_CONTENT;
-
         $transportMock->expects($this->once())
             ->method('delete')
-            ->will($this->returnValue($expectedResults));
+            ->will($this->returnValue($this->getResultNoContent()));
 
         $email = new Email($transportMock);
 
@@ -99,13 +95,9 @@ class EmailTest extends ApiTest
     {
         $transportMock = $this->getTransportMock();
 
-        // Setup exepected result - Need to set HTTP status
-        $expectedResults = array();
-        $expectedResults['status'] = Api::HTTP_STATUS_NOT_FOUND;
-
         $transportMock->expects($this->once())
             ->method('delete')
-            ->will($this->returnValue($expectedResults));
+            ->will($this->returnValue($this->getResultNotFound()));
 
         $email = new Email($transportMock);
 
@@ -136,10 +128,11 @@ class EmailTest extends ApiTest
             'd.syph.3r@gmail.com',
             'octocat@github.com'
         );
-
-        return array(
-            'data'      => array_merge($emails, $additionalEmails),
-            'status'    => Api::HTTP_STATUS_OK
-        );
+        
+        $response = new \Buzz\Message\Response;
+        $response->setContent(array_merge($emails, $additionalEmails));
+        $response->addHeader('HTTP/1.1 200 OK');
+        
+        return $response;
     }
 }
