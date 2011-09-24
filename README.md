@@ -17,7 +17,7 @@ around the GitHub API v3. This is achieved using a number of methods:
 ```php
     use GitHub\API\User\User;
     
-    // Setup the user, and authenticate
+    // Setup the user, and authenticate (using basic HTTP auth)
     $user = new User();
     $user->setCredentials(new Authentication\Basic('username', 'password'));
     $user->login();
@@ -52,11 +52,10 @@ The following resources for the API are covered:
 ### Requirements
 
  * PHP 5.3+ 
- * Curl
 
 ### Dependancies
 
- * [curl-php](https://github.com/dsyph3r/curl-php)
+ * [Buzz](https://github.com/dsyph3r/Buzz)
 
 ### Installation
 
@@ -88,9 +87,29 @@ Ideas from the excellent
 
 ## Authentication
 
-At present only basic authentication is available. OAuth with be available soon.
+Authentication is supported for both basic HTTP and OAuth. OAuth is the recommened
+way to authenticate. (Note: This library does not actually deal with how you
+do the OAuth process to retrieve the access token. You must implement this your
+self. See [oauth2-php](https://github.com/dsyph3r/oauth2-php) lib for an
+implementation of this).
 
 Authentication can be achieved as follows.
+
+### OAuth
+
+```php
+    use GitHub\API\User\User;
+    
+    $user = new User();
+    $user->setCredentials(new Authentication\OAuth('access_token'));
+    $user->login();
+
+    // Perform operations that require authentication ...
+
+    $user->logout();
+```
+
+### Basic
 
 ```php
     use GitHub\API\User\User;
