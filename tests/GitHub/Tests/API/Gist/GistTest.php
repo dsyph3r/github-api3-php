@@ -5,6 +5,7 @@ namespace GitHub\Tests\API\Gist;
 use GitHub\API\Api;
 use GitHub\API\Gist\Gist;
 use GitHub\Tests\API\ApiTest;
+use GitHub\API\Authentication;
 
 class GistTest extends ApiTest
 {
@@ -15,13 +16,13 @@ class GistTest extends ApiTest
         $expectedResults = $this->getResultGists();
 
         $transportMock->expects($this->once())
-            ->method('get')
+            ->method('send')
             ->will($this->returnValue($expectedResults));
 
         $gist = new Gist($transportMock);
 
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $result = $gist->all();
         $this->assertEquals('https://api.github.com/gists/1', $result[0]['url']);
@@ -34,7 +35,7 @@ class GistTest extends ApiTest
         $expectedResults = $this->getResultGists();
 
         $transportMock->expects($this->once())
-            ->method('get')
+            ->method('send')
             ->will($this->returnValue($expectedResults));
 
         $gist = new Gist($transportMock);
@@ -47,7 +48,7 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->never())
-            ->method('get')
+            ->method('send')
             ->will($this->returnValue(array()));
 
         $gist = new Gist($transportMock);
@@ -63,13 +64,13 @@ class GistTest extends ApiTest
         $expectedResults = $this->getResultGist();
 
         $transportMock->expects($this->once())
-            ->method('get')
+            ->method('send')
             ->will($this->returnValue($expectedResults));
 
         $gist = new Gist($transportMock);
 
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $result = $gist->get(1);
         $this->assertEquals('https://api.github.com/gists/1', $result['url']);
@@ -90,13 +91,13 @@ class GistTest extends ApiTest
         $expectedResults->addHeader('HTTP/1.1 201 Created');
 
         $transportMock->expects($this->once())
-            ->method('post')
+            ->method('send')
             ->will($this->returnValue($expectedResults));
 
         $gist = new Gist($transportMock);
 
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $result = $gist->create($files, true, "description");
         $this->assertEquals('File 1 contents', $result['files']['file1.txt']['content']);
@@ -109,7 +110,7 @@ class GistTest extends ApiTest
         $files = array('file1.txt' => array('content' => 'File 1 contents'));
 
         $transportMock->expects($this->once())
-            ->method('post')
+            ->method('send')
             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $gist = new Gist($transportMock);
@@ -132,13 +133,13 @@ class GistTest extends ApiTest
         $expectedResults = $this->getResultGist($gistResult);
 
         $transportMock->expects($this->once())
-            ->method('patch')
+            ->method('send')
             ->will($this->returnValue($expectedResults));
 
         $gist = new Gist($transportMock);
 
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $result = $gist->update(1, $files, "description update");
         $this->assertEquals('description update', $result['description']);
@@ -151,7 +152,7 @@ class GistTest extends ApiTest
         $files = array('file1.txt' => array('content' => 'File 1 contents'));
 
         $transportMock->expects($this->once())
-            ->method('patch')
+            ->method('send')
             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $gist = new Gist($transportMock);
@@ -165,12 +166,12 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('put')
+             ->method('send')
              ->will($this->returnValue($this->getResultNoContent()));
 
         $gist = new Gist($transportMock);
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $this->assertTrue($gist->star(1));
     }
@@ -180,7 +181,7 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('put')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $gist = new Gist($transportMock);
@@ -194,12 +195,12 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('delete')
+             ->method('send')
              ->will($this->returnValue($this->getResultNoContent()));
 
         $gist = new Gist($transportMock);
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $this->assertTrue($gist->unstar(1));
     }
@@ -209,7 +210,7 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('delete')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $gist = new Gist($transportMock);
@@ -223,12 +224,12 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($this->getResultNoContent()));
 
         $gist = new Gist($transportMock);
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $this->assertTrue($gist->isStarred(1));
     }
@@ -238,7 +239,7 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $gist = new Gist($transportMock);
@@ -256,13 +257,13 @@ class GistTest extends ApiTest
         $expectedResults->addHeader('HTTP/1.1 201 Created');
 
         $transportMock->expects($this->once())
-            ->method('post')
+            ->method('send')
             ->will($this->returnValue($expectedResults));
 
         $gist = new Gist($transportMock);
 
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $result = $gist->fork(1);
         $this->assertEquals('ring.erl', $result['files']['ring.erl']['filename']);
@@ -273,7 +274,7 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('post')
+            ->method('send')
             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $gist = new Gist($transportMock);
@@ -287,13 +288,13 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('delete')
+            ->method('send')
             ->will($this->returnValue($this->getResultNoContent()));
 
         $gist = new Gist($transportMock);
 
         // Get authenticated
-        $gist->setCredentials('username', 'password');
+        $gist->setCredentials(new Authentication\Basic('username', 'password'));
         $gist->login();
         $this->assertTrue($gist->delete(1));
     }
@@ -303,7 +304,7 @@ class GistTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('delete')
+            ->method('send')
             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $gist = new Gist($transportMock);

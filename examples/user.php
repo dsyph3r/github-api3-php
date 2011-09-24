@@ -20,6 +20,7 @@ $loader->registerNamespaces(array(
 $loader->register();
 
 
+use GitHub\API\Authentication;
 use GitHub\API\User\User;
 use GitHub\API\AuthenticationException;
 
@@ -40,7 +41,7 @@ var_dump($user->following('dsyph3r'));
  * Perform operations that require authentication
  */
 // Set user credentials and login
-$user->setCredentials('username', 'password');
+$user->setCredentials(new Authentication\Basic('username', 'password'));
 $user->login();
 
 try

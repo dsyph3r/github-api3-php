@@ -19,7 +19,7 @@ around the GitHub API v3. This is achieved using a number of methods:
     
     // Setup the user, and authenticate
     $user = new User();
-    $user->setCredentials('username', 'password');
+    $user->setCredentials(new Authentication\Basic('username', 'password'));
     $user->login();
 
     // Get the user details
@@ -96,7 +96,7 @@ Authentication can be achieved as follows.
     use GitHub\API\User\User;
     
     $user = new User();
-    $user->setCredentials('username', 'password');
+    $user->setCredentials(new Authentication\Basic('username', 'password'));
     $user->login();
 
     // Perform operations that require authentication ...

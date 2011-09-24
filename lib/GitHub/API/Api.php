@@ -48,15 +48,6 @@ class Api
     const DEFAULT_PAGE_SIZE  = 30;
 
     /**
-     * Constants for authentication methods. AUTH_TYPE_OAUTH is currently not
-     * implemented
-     *
-     * @link http://developer.github.com/v3/#authentication
-     */
-    const AUTH_TYPE_BASIC   = 'basic';
-    const AUTH_TYPE_OAUTH   = 'oauth';
-
-    /**
      * Transport layer
      *
      * @var Transport
@@ -72,18 +63,11 @@ class Api
     protected $authenticated = false;
 
     /**
-     * Authenticaton username
+     * Authenticator to use (Basic|OAuth)
      *
-     * @var string
+     * @var AuthenticationInterface
      */
-    protected $authUsername  = null;
-
-    /**
-     * Authentication password
-     *
-     * @var string
-     */
-    protected $authPassword  = null;
+    protected $authenticator  = null;
 
     /**
      * Constructor
@@ -97,20 +81,18 @@ class Api
         else
             $this->transport = $transport;
     }
-
+    
     /**
-    * Sets user credentials. Setting credentials does not log the user in.
-    * A call to login() must be made aswell
+    * Sets user credentials via an AuthenticationInterface. Setting credentials
+    * does not log the user in. A call to login() must be made aswell
     *
-    * @param   string  $username       Username
-    * @param   string  $password       Password
+    * @param   AuthenticationInterface  $authenticator       Authenticator
     */
-    public function setCredentials($username, $password)
+    public function setCredentials(Authentication\AuthenticationInterface $authenticator)
     {
-        $this->authUsername = $username;
-        $this->authPassword = $password;
+        $this->authenticator = $authenticator;
     }
-
+    
     /**
      * Clears credentials. Clearing credentials does not logout the user. A call
      * to logout() must be made first
@@ -119,8 +101,7 @@ class Api
     {
         if (false === $this->isAuthenticated())
         {
-            $this->authUsername = '';
-            $this->authPassword = '';
+            $this->authenticator = null;
         }
         else
             throw new ApiException('You must logout before clearing credentials. Use logout() first');
@@ -132,7 +113,7 @@ class Api
      */
     public function login()
     {
-        if ((!strlen($this->authUsername)) || !strlen($this->authPassword))
+        if (null === $this->authenticator)
             throw new ApiException('Cannot login. You must specify the credentials first. Use setCredentials()');
 
         $this->authenticated = true;
@@ -177,11 +158,9 @@ class Api
      * @param   array   $params       Any GET params
      * @return  mixed                 API response
      */
-    public function requestGet($url, $params = array(), $options = array())
+    public function requestGet($url, $params = array(), $headers = array())
     {
-        $options = $this->applyAuthentication($options);
-
-        return $this->transport->get(self::API_URL . $url, $params, $options);
+        return $this->doRequest('GET', self::API_URL . $url, $params, $headers);
     }
 
     /**
@@ -191,13 +170,11 @@ class Api
      * @param   array   $params       Any POST params
      * @return  mixed                 API response
      */
-    public function requestPost($url, $params = array(), $options = array())
+    public function requestPost($url, $params = array(), $headers = array())
     {
-        $options = $this->applyAuthentication($options);
-
         $params = (count($params)) ? json_encode($params) : null;
 
-        return $this->transport->post(self::API_URL . $url, $params, $options);
+        return $this->doRequest('POST', self::API_URL . $url, $params, $headers);
     }
 
     /**
@@ -207,13 +184,11 @@ class Api
      * @param   array   $params       Any PUT params
      * @return  mixed                 API response
      */
-    public function requestPut($url, $params = array(), $options = array())
+    public function requestPut($url, $params = array(), $headers = array())
     {
-        $options = $this->applyAuthentication($options);
-
         $params = (count($params)) ? json_encode($params) : null;
 
-        return $this->transport->put(self::API_URL . $url, $params, $options);
+        return $this->doRequest('PUT', self::API_URL . $url, $params, $headers);
     }
 
     /**
@@ -223,13 +198,11 @@ class Api
      * @param   array   $params       Any PATCH params
      * @return  mixed                 API response
      */
-    public function requestPatch($url, $params = array(), $options = array())
+    public function requestPatch($url, $params = array(), $headers = array())
     {
-        $options = $this->applyAuthentication($options);
-
         $params = (count($params)) ? json_encode($params) : null;
 
-        return $this->transport->patch(self::API_URL . $url, $params, $options);
+        return $this->doRequest('PATCH', self::API_URL . $url, $params, $headers);
     }
 
     /**
@@ -239,34 +212,36 @@ class Api
      * @param   array   $params       Any DELETE params
      * @return  mixed                 API response
      */
-    public function requestDelete($url, $params = array(), $options = array())
+    public function requestDelete($url, $params = array(), $headers = array())
     {
-        $options = $this->applyAuthentication($options);
-
         $params = (count($params)) ? json_encode($params) : null;
 
-        return $this->transport->delete(self::API_URL . $url, $params, $options);
+        return $this->doRequest('DELETE', self::API_URL . $url, $params, $headers);
     }
 
     /**
-     * Check if authentication needs to be applied to requests
+     * Perform HTTP request
      *
-     * @param   array   $options        Array of options to add auth to
-     * @return  array                   Updated options
+     * @param   string  $method       HTTP method
+     * @param   string  $url          Full URL including protocol
+     * @param   array   $params       Any params
+     * @return  mixed                 API response
      */
-    public function applyAuthentication($options)
+    protected function doRequest($method, $url, $params, $headers)
     {
-        if ($this->isAuthenticated())
-        {
-            // Only supports basic auth for now
-            $options['auth'] = array(
-                'type'      => self::AUTH_TYPE_BASIC,
-                'username'  => $this->authUsername,
-                'password'  => $this->authPassword
-            );
-        }
+        $request = $this->transport->createRequest();
 
-        return $options;
+        $request->setMethod($method);
+        $request->fromUrl($url);
+        $request->addHeaders($headers);
+        $request->setContent($params);
+
+        if ($this->isAuthenticated() && null !== $this->authenticator)
+        {
+            $request = $this->authenticator->authenticate($request);
+        }
+        
+        return $this->transport->send($request);        
     }
 
     /**

@@ -8,13 +8,14 @@ abstract class ApiTest extends \PHPUnit_Framework_TestCase
 {
     protected function getTransportMock()
     {
-        return $this->getMock('Buzz\Browser', array('get', 'post', 'put', 'patch', 'delete'));
+        return $this->getMock('Buzz\Browser', array('send'));
     }
 
     protected function getResultUnauthorized()
     {
         $response = new \Buzz\Message\Response;
         $response->addHeader('HTTP/1.1 401 Unauthorized');
+        
         return $response;
     }
     
@@ -22,6 +23,7 @@ abstract class ApiTest extends \PHPUnit_Framework_TestCase
     {
         $response = new \Buzz\Message\Response;
         $response->addHeader('HTTP/1.1 204 No Content');
+        
         return $response;
     }
     
@@ -29,6 +31,7 @@ abstract class ApiTest extends \PHPUnit_Framework_TestCase
     {
         $response = new \Buzz\Message\Response;
         $response->addHeader('HTTP/1.1 404 Not Found');
+        
         return $response;
     }
 }

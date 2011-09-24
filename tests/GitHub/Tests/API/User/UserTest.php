@@ -5,6 +5,7 @@ namespace GitHub\Tests\API\User;
 use GitHub\API\Api;
 use GitHub\API\User\User;
 use GitHub\Tests\API\ApiTest;
+use GitHub\API\Authentication;
 
 class UserTest extends ApiTest
 {
@@ -15,7 +16,7 @@ class UserTest extends ApiTest
         $expectedResults = $this->getResultUser();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($expectedResults));
 
         $user = new User($transportMock);
@@ -32,12 +33,12 @@ class UserTest extends ApiTest
         $expectedResults = $this->getResultUser();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($expectedResults));
 
         $user = new User($transportMock);
         // Get authenticated
-        $user->setCredentials('username', 'password');
+        $user->setCredentials(new Authentication\Basic('username', 'password'));
         $user->login();
         $result = $user->get();
         $this->assertEquals('octocat', $result['login']);
@@ -48,7 +49,7 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
@@ -66,12 +67,12 @@ class UserTest extends ApiTest
 
         // Update the return value for name
         $transportMock->expects($this->once())
-             ->method('patch')
+             ->method('send')
              ->will($this->returnValue($this->getResultUser($changes)));
 
         $user = new User($transportMock);
         // Get authenticated
-        $user->setCredentials('username', 'password');
+        $user->setCredentials(new Authentication\Basic('username', 'password'));
         $user->login();
         $result = $user->update($changes);
         $this->assertEquals('dsyph3r', $result['name']);
@@ -85,7 +86,7 @@ class UserTest extends ApiTest
         $changes = array('name' => 'dsyph3r');
         
         $transportMock->expects($this->once())
-             ->method('patch')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
@@ -101,7 +102,7 @@ class UserTest extends ApiTest
         $expectedResults = $this->getResultFollowers();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($expectedResults));
 
         $user = new User($transportMock);
@@ -118,12 +119,12 @@ class UserTest extends ApiTest
         $expectedResults = $this->getResultFollowers();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($expectedResults));
 
         $user = new User($transportMock);
         // Get authenticated
-        $user->setCredentials('username', 'password');
+        $user->setCredentials(new Authentication\Basic('username', 'password'));
         $user->login();
         $result = $user->followers();
         $this->assertEquals('octocat', $result[0]['login']);
@@ -134,11 +135,11 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
-        $user->setCredentials('username', 'password');
+        $user->setCredentials(new Authentication\Basic('username', 'password'));
         // Ensure login/logout process also works
         $user->login();
         $user->logout();
@@ -155,7 +156,7 @@ class UserTest extends ApiTest
         $expectedResults = $this->getResultFollowing();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($expectedResults));
 
         $user = new User($transportMock);
@@ -172,12 +173,12 @@ class UserTest extends ApiTest
         $expectedResults = $this->getResultFollowing();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($expectedResults));
 
         $user = new User($transportMock);
         // Get authenticated
-        $user->setCredentials('username', 'password');
+        $user->setCredentials(new Authentication\Basic('username', 'password'));
         $user->login();
         $result = $user->following();
         $this->assertEquals('octocat', $result[0]['login']);
@@ -188,7 +189,7 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
@@ -202,12 +203,12 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('put')
+             ->method('send')
              ->will($this->returnValue($this->getResultNoContent()));
 
         $user = new User($transportMock);
         // Get authenticated
-        $user->setCredentials('username', 'password');
+        $user->setCredentials(new Authentication\Basic('username', 'password'));
         $user->login();
         $this->assertTrue($user->follow('dsyph3r'));
     }
@@ -217,7 +218,7 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('put')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
@@ -231,12 +232,12 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('delete')
+             ->method('send')
              ->will($this->returnValue($this->getResultNoContent()));
 
         $user = new User($transportMock);
         // Get authenticated
-        $user->setCredentials('username', 'password');
+        $user->setCredentials(new Authentication\Basic('username', 'password'));
         $user->login();
         $this->assertTrue($user->unfollow('dsyph3r'));
     }
@@ -246,7 +247,7 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('delete')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);
@@ -260,12 +261,12 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($this->getResultNoContent()));
 
         $user = new User($transportMock);
         // Get authenticated
-        $user->setCredentials('username', 'password');
+        $user->setCredentials(new Authentication\Basic('username', 'password'));
         $user->login();
         $this->assertTrue($user->isFollowing('dsyph3r'));
     }
@@ -275,7 +276,7 @@ class UserTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $user = new User($transportMock);

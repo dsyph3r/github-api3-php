@@ -5,6 +5,7 @@ namespace GitHub\Tests\API\User;
 use GitHub\API\Api;
 use GitHub\API\User\Key;
 use GitHub\Tests\API\ApiTest;
+use GitHub\API\Authentication;
 
 class KeyTest extends ApiTest
 {
@@ -13,13 +14,13 @@ class KeyTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('get')
+            ->method('send')
             ->will($this->returnValue($this->getResultKeys()));
 
         $key = new Key($transportMock);
 
         // Get authenticated
-        $key->setCredentials('username', 'password');
+        $key->setCredentials(new Authentication\Basic('username', 'password'));
         $key->login();
         $result = $key->all();
         $this->assertEquals('octocat@octomac', $result[0]['title']);
@@ -30,7 +31,7 @@ class KeyTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-             ->method('get')
+             ->method('send')
              ->will($this->returnValue($this->getResultUnauthorized()));
 
         $key = new Key($transportMock);
@@ -46,13 +47,13 @@ class KeyTest extends ApiTest
         $expectedResult = $this->getResultKey();
 
         $transportMock->expects($this->once())
-            ->method('get')
+            ->method('send')
             ->will($this->returnValue($expectedResult));
 
         $key = new Key($transportMock);
 
         // Get authenticated
-        $key->setCredentials('username', 'password');
+        $key->setCredentials(new Authentication\Basic('username', 'password'));
         $key->login();
         $result = $key->get(1);
         $this->assertEquals('octocat@octomac', $result['title']);
@@ -63,7 +64,7 @@ class KeyTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('get')
+            ->method('send')
             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $key = new Key($transportMock);
@@ -82,13 +83,13 @@ class KeyTest extends ApiTest
         $expectedResults->addHeader('HTTP/1.1 201 Created');
 
         $transportMock->expects($this->once())
-            ->method('post')
+            ->method('send')
             ->will($this->returnValue($expectedResults));
 
         $key = new Key($transportMock);
 
         // Get authenticated
-        $key->setCredentials('username', 'password');
+        $key->setCredentials(new Authentication\Basic('username', 'password'));
         $key->login();
         $result = $key->create($create['title'], $create['key']);
         $this->assertEquals('New Key Title', $result[2]['title']);
@@ -100,7 +101,7 @@ class KeyTest extends ApiTest
 
         // Should never try to access the API - expecting Exception
         $transportMock->expects($this->once())
-            ->method('post')
+            ->method('send')
             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $key = new Key($transportMock);
@@ -118,13 +119,13 @@ class KeyTest extends ApiTest
         $expectedResults = $this->getResultKey($update);
 
         $transportMock->expects($this->once())
-            ->method('patch')
+            ->method('send')
             ->will($this->returnValue($expectedResults));
 
         $key = new Key($transportMock);
 
         // Get authenticated
-        $key->setCredentials('username', 'password');
+        $key->setCredentials(new Authentication\Basic('username', 'password'));
         $key->login();
         $result = $key->update($update['title'], $update['key']);
         $this->assertEquals('Update Key Title', $result['title']);
@@ -135,7 +136,7 @@ class KeyTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('patch')
+            ->method('send')
             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $key = new Key($transportMock);
@@ -149,13 +150,13 @@ class KeyTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('delete')
+            ->method('send')
             ->will($this->returnValue($this->getResultNoContent()));
 
         $key = new Key($transportMock);
 
         // Get authenticated
-        $key->setCredentials('username', 'password');
+        $key->setCredentials(new Authentication\Basic('username', 'password'));
         $key->login();
         $result = $key->delete(1);
         $this->assertTrue($result);
@@ -166,13 +167,13 @@ class KeyTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('delete')
+            ->method('send')
             ->will($this->returnValue($this->getResultNotFound()));
 
         $key = new Key($transportMock);
 
         // Get authenticated
-        $key->setCredentials('username', 'password');
+        $key->setCredentials(new Authentication\Basic('username', 'password'));
         $key->login();
         $result = $key->delete(1);
         $this->assertFalse($result);
@@ -183,7 +184,7 @@ class KeyTest extends ApiTest
         $transportMock = $this->getTransportMock();
 
         $transportMock->expects($this->once())
-            ->method('delete')
+            ->method('send')
             ->will($this->returnValue($this->getResultUnauthorized()));
 
         $key = new Key($transportMock);
