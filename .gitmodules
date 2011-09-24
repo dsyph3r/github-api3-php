@@ -1,3 +1,0 @@
-[submodule "lib/vendor/curl-php"]
-	path = lib/vendor/curl-php
-	url = git@github.com:dsyph3r/curl-php.git
