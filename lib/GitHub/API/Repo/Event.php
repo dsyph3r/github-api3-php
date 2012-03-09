@@ -1,6 +1,6 @@
 <?php
 
-namespace GitHub\API\Issue;
+namespace GitHub\API\Repo;
 
 use GitHub\API\Api;
 use GitHub\API\ApiException;
