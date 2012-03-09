@@ -41,7 +41,7 @@ class Repo extends \GitHub\API\Repo\Repo
         if (false === in_array($repoType, $this->allowedRepoTypes))
             throw new ApiException("Unsupported $repoType option. Available types are " . join(", ", $this->allowedRepoTypes));
 
-        $params   = array_merge(array('type' => $repoType), $sort, $this->buildPageParams($page, $pageSize));
+        $params   = array_merge(array('type' => $repoType), $this->buildPageParams($page, $pageSize));
 
         if (is_null($username))
             $url = 'user/repos';
