@@ -1,0 +1,13 @@
+{
+    "name": "dsyph3r/github-api3-php",
+    "description": "GitHub API",
+    "homepage": "https://github.com/dsyph3r/github-api3-php",
+    "keywords": ["github"],
+    "license": "MIT",
+    "require": {
+        "kriswallsmith/buzz": "*"
+    },
+    "autoload": {
+        "psr-0": { "Github": "lib/" }
+    }
+}
