@@ -127,7 +127,7 @@ abstract class Repo extends Api
     public function edit($username, $repo, $details = array())
     {
         // Add repo name into details
-        $details['name'] = $repoName;
+        $details['name'] = $repo;
         
         return $this->processResponse(
             $this->requestPatch("repos/$username/$repo", $this->buildParams($details))
