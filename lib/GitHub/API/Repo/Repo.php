@@ -410,4 +410,104 @@ abstract class Repo extends Api
 
         return $this->event;
     }
+
+    /**
+     * List repository stargazers.
+     *
+     * Authentication Required: false|true
+     *
+     * @link http://developer.github.com/v3/activity/starring/#list-stargazers
+     *
+     * @param   string        $username           GitHub username of repo owner
+     * @param   string        $repo               Name of repository
+     * @param   int           $page               Paginated page to get
+     * @param   int           $pageSize           Size of paginated page. Max 100
+     * @return  array|bool                        Returns the list of stargazers or FALSE
+     *                                            if the request failed
+     */
+    public function stargazers($username, $repo, $page = 1, $pageSize = self::DEFAULT_PAGE_SIZE)
+    {
+        return $this->processResponse(
+            $this->requestGet("repos/$username/$repo/stargazers", $this->buildPageParams($page, $pageSize))
+        );
+    }
+
+    /**
+     * List repositories being starred by user.
+     *
+     * Authentication Required: false|true
+     *
+     * @link http://developer.github.com/v3/activity/starring/#list-repositories-being-starred
+     *
+     * @param   string        $username           GitHub username
+     * @return  array|bool                        Returns the list of starred repos or FALSE
+     *                                            if the request failed
+     */
+    public function starred($username = null)
+    {
+        if (is_null($username))
+            $url = 'user/starred';
+        else
+            $url = "users/$username/starred";
+
+        return $this->processResponse(
+            $this->requestGet($url)
+        );
+    }
+
+    /**
+     * Check if a repository is being starred by authenticated user.
+     *
+     * Authentication Required: true
+     *
+     * @link http://developer.github.com/v3/activity/starring/#check-if-you-are-starring-a-repository
+     *
+     * @param   string        $username           GitHub username
+     * @param   string        $repo               Name of repository
+     * @return  array|bool                        Returns TRUE if the repo is being starred
+     */
+    public function isStarred($username, $repo)
+    {
+        $url = "users/starred/$username/$repo";
+
+        return $this->processResponse(
+            $this->requestGet($url)
+        );
+    }
+
+    /**
+     * Star a repository.
+     *
+     * Authentication Required: true
+     *
+     * @link http://developer.github.com/v3/activity/starring/#star-a-repository
+     *
+     * @param   string        $username           GitHub username
+     * @param   string        $repo               Name of repository
+     * @return  array|bool                        Returns TRUE if the repo is being starred
+     */
+    public function star($username, $repo)
+    {
+        return $this->processResponse(
+            $this->requestPut("user/starred/$username/$repo")
+        );
+    }
+
+    /**
+     * Unstar a repository.
+     *
+     * Authentication Required: true
+     *
+     * @link http://developer.github.com/v3/activity/starring/#unstar-a-repository
+     *
+     * @param   string        $username           GitHub username
+     * @param   string        $repo               Name of repository
+     * @return  array|bool                        Returns TRUE if the repo is being unstarred
+     */
+    public function unstar($username, $repo)
+    {
+        return $this->processResponse(
+            $this->requestDelete("user/starred/$username/$repo")
+        );
+    }
 }
