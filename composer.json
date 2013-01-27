@@ -8,6 +8,6 @@
         "kriswallsmith/buzz": "*"
     },
     "autoload": {
-        "psr-0": { "Github": "lib/" }
+        "psr-0": { "GitHub": "lib/" }
     }
 }
