@@ -34,7 +34,7 @@ class Commit extends Api
      * @return  array                     List of commit(s) or FALSE if the request
      *                                    failed
      */
-    public function all($usename, $repo, $sha = null, $path = null)
+    public function all($username, $repo, $sha = null, $path = null)
     {
         $params = array(
            'sha'   => $sha,
