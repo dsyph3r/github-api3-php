@@ -28,7 +28,7 @@ class Download extends Api
      * @return  array                     List of downloads(s) or FALSE if the request
      *                                    failed
      */
-    public function all($usename, $repo, $sha = null, $path = null)
+    public function all($username, $repo, $sha = null, $path = null)
     {
         // Optional filters
         $params = array(
@@ -53,7 +53,7 @@ class Download extends Api
      * @param   int     $id               ID of download
      * @return  array|bool                Details of the download or FALSE if the request failed
      */
-    public function get($usename, $repo, $id)
+    public function get($username, $repo, $id)
     {
         return $this->processResponse(
             $this->requestGet("repos/$username/$repo/downloads/$id")

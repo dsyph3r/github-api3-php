@@ -58,10 +58,10 @@ class Commit extends Api
      * @param   string  $sha              Sha of commit
      * @return  array|bool                Details of the commit or FALSE if the request failed
      */
-    public function get($usename, $repo, $sha)
+    public function get($username, $repo, $sha)
     {
         return $this->processResponse(
-            $this->requestGet("gists/comments/$id")
+            $this->requestGet("repos/$username/$repo/commits/$sha")
         );
     }
  
